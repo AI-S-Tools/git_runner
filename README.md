@@ -1,112 +1,156 @@
 # Git Runner
 
-**Automated Git Operations Tool for Multi-Repository Projects**
+**Automated Git Operations Tool with AI-Powered Commit Messages**
 
-## Core Function
-Automated periodic git commits and push operations across multiple repositories within a project structure. Designed for continuous development workflows with intelligent repository discovery.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js Version](https://img.shields.io/badge/node-%3E%3D16.0.0-green)](https://nodejs.org/)
 
-## Executable Information
-- **Primary Executable**: `git_runner.dart`
-- **Location**: `/Users/lpm/Repo/mfp_tools/git_runner/git_runner.dart`
-- **Runtime**: Dart VM
-- **Execution**: `dart run git_runner.dart`
+Automated periodic git commits and push operations across multiple repositories with intelligent AI-generated commit messages. Designed for continuous development workflows with smart repository discovery.
 
-## Key Features
+## 🚀 Quick Start
 
-### Repository Discovery
-- **Main Repository**: Automatically detects project root via `.git` directory
-- **Workspace Integration**: Parses `.code-workspace` files for additional repositories
-- **Submodule Support**: Processes all Git submodules defined in `.gitmodules`
+### Download Standalone Binary (Recommended)
+
+Choose your platform and download the standalone executable:
+
+```bash
+# Linux
+wget https://github.com/AI-S-Tools/git_runner/releases/latest/download/git_runner-linux
+chmod +x git_runner-linux
+sudo mv git_runner-linux /usr/local/bin/git_runner
+
+# macOS
+wget https://github.com/AI-S-Tools/git_runner/releases/latest/download/git_runner-macos
+chmod +x git_runner-macos
+sudo mv git_runner-macos /usr/local/bin/git_runner
+
+# Windows
+# Download git_runner.exe from releases and add to PATH
+```
+
+### Alternative: Install via npm
+
+```bash
+npm install -g @ai-s-tools/git-runner
+```
+
+### Usage
+
+```bash
+cd your-project-directory
+git_runner
+```
+
+## ✨ Key Features
+
+### 🤖 AI-Powered Commit Messages
+- **Gemini**: Primary AI model for commit message generation
+- **Qwen**: Secondary fallback AI model
+- **Claude**: Tertiary fallback AI model
+- **Automatic Fallback**: Uses timestamp-based messages if AI unavailable
+
+### 📁 Smart Repository Discovery
+- **Project Root Detection**: Automatically finds `.git` directories
+- **Workspace Integration**: Parses VS Code `.code-workspace` files
+- **Submodule Support**: Processes Git submodules from `.gitmodules`
 - **Processing Order**: Submodules first, then main repositories (prevents conflicts)
 
-### Automation Capabilities
+### ⚡ Automation Capabilities
 - **Periodic Commits**: Automatic commits every 5 minutes
-- **Intelligent Commit Messages**: Uses `trae-cli` integration when available
-- **Remote Detection**: Automatically pushes only when remote repositories exist
-- **Interactive Control**: Real-time keyboard commands during execution
+- **Intelligent Push**: Only pushes when remote repositories exist
+- **Multi-Repository**: Handles complex project structures
+- **Interactive Control**: Real-time keyboard commands
 
-### Interactive Commands
+### 🎮 Interactive Commands
 - `r` - Manual re-scan and process all repositories
 - `R` - Reload/restart the entire script
 - `q` - Graceful shutdown with timer cleanup
 
-### Integration Features
-- **Trae-CLI Integration**: Generates intelligent commit messages when available
-- **VS Code Task Integration**: Can be configured as VS Code task
-- **Process Management**: Proper cleanup and restart capabilities
-- **Error Handling**: Continues operation even if individual repositories fail
-
-## Technical Implementation
+## 🔧 Technical Details
 
 ### Repository Processing Logic
-1. Scans from script directory upward to find project root
+1. Scans upward from current directory to find project root
 2. Identifies all Git repositories (main + workspace + submodules)
 3. Processes submodules first to avoid merge conflicts
-4. Commits changes with intelligent or fallback messages
-5. Pushes to remote only if remote exists
+4. Generates AI commit messages or falls back to timestamps
+5. Pushes to remote only when remotes exist
 
-### Commit Message Strategy
-- **With trae-cli**: Generates contextual commit messages
-- **Fallback**: Uses timestamp-based commit messages
-- **Error Recovery**: Continues with basic messages if trae-cli fails
+### AI Integration Requirements
+Git Runner automatically detects and uses available AI CLI tools:
+- **Gemini CLI** (`gemini`) - Highest priority
+- **Qwen CLI** (`qwen`) - Medium priority
+- **Claude CLI** (`claude`) - Lowest priority
 
-### File System Operations
-- **Path Resolution**: Uses `package:path` for cross-platform compatibility
-- **Directory Traversal**: Recursive scanning with safety limits
-- **JSON Parsing**: Workspace file parsing with error handling
+Install any of these CLI tools for intelligent commit messages. No API tokens required!
 
-## Configuration Requirements
+### Supported Platforms
+- **Linux** (x64)
+- **macOS** (x64)
+- **Windows** (x64)
 
-### Dependencies (pubspec.yaml)
-```yaml
-dependencies:
-  path: ^1.8.0
-  process: ^4.2.0
-```
+## 📦 Development
 
-### Optional External Tools
-- **trae-cli**: For intelligent commit message generation
-- **VS Code**: For workspace file integration
-
-## Usage Patterns
-
-### Standalone Execution
+### From Source
 ```bash
-cd /path/to/project
-dart run /Users/lpm/Repo/mfp_tools/git_runner/git_runner.dart
+git clone https://github.com/AI-S-Tools/git_runner.git
+cd git_runner
+npm install
+npm run build
+npm start
 ```
 
-### VS Code Task Integration
+### Build Binaries
+```bash
+npm run pkg:build    # All platforms
+npm run pkg:linux    # Linux only
+npm run pkg:macos    # macOS only
+npm run pkg:windows  # Windows only
+```
+
+## 🔄 VS Code Integration
+
 Add to `.vscode/tasks.json`:
 ```json
 {
   "label": "Git Runner",
   "type": "shell",
-  "command": "dart",
-  "args": ["run", "/Users/lpm/Repo/mfp_tools/git_runner/git_runner.dart"],
+  "command": "git_runner",
   "group": "build",
   "presentation": {
     "echo": true,
     "reveal": "always",
     "panel": "new"
-  }
+  },
+  "isBackground": true
 }
 ```
 
-### Development Workflow Integration
-- Start at beginning of development session
-- Runs continuously in background
-- Provides automatic backup of work progress
-- Enables easy rollback via Git history
-
-## Error Handling
+## 🛡️ Error Handling
 - **Repository Access**: Continues if individual repositories fail
 - **Network Issues**: Skips push operations when remote unavailable
-- **Tool Dependencies**: Graceful fallback when trae-cli unavailable
+- **AI Dependencies**: Graceful fallback when AI tools unavailable
 - **Process Management**: Proper cleanup on shutdown or restart
 
-## Performance Characteristics
+## 📊 Performance
 - **Memory Usage**: Minimal - processes repositories sequentially
 - **CPU Impact**: Low - only active during 5-minute intervals
 - **Network Usage**: Only when pushing to remotes
-- **Disk I/O**: Minimal - only Git operations and log output
+- **Binary Size**: ~40-50MB standalone executables
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- Built with TypeScript and Node.js
+- AI integration via local CLI tools (Gemini, Qwen, Claude)
+- Cross-platform binaries created with [pkg](https://github.com/vercel/pkg)
