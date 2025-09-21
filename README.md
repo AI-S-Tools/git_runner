@@ -9,7 +9,26 @@ Automated periodic git commits and push operations across multiple repositories 
 
 ## 🚀 Quick Start
 
-### Download Standalone Binary (Recommended)
+### Package Manager Install (Recommended)
+
+```bash
+# Ubuntu/Linux (Snap)
+sudo snap install git-runner
+
+# macOS (Homebrew) - Coming soon
+brew install ai-s-tools/tap/git-runner
+
+# Windows (Chocolatey) - Coming soon
+choco install git-runner
+```
+
+### One-Line Install Script
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/AI-S-Tools/git_runner/main/install.sh | bash
+```
+
+### Download Standalone Binary (Alternative)
 
 Choose your platform and download the standalone executable:
 
