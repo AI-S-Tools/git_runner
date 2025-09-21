@@ -1,84 +1,73 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code) when working with this project.
 
 ## Project Overview
 
-Git Runner is a TypeScript-based automated Git operations tool designed for continuous development workflows. It performs periodic commits and pushes across multiple repositories within a project structure with intelligent repository discovery.
+Git Runner is a TypeScript-based automated Git operations tool designed for continuous development workflows. It performs periodic commits and pushes across multiple repositories with AI-powered commit messages using local CLI tools.
 
-## Development Commands
+## Repository Information
 
-### Building the Application
+**GitHub Repository**: https://github.com/AI-S-Tools/git_runner
+**Published Project**: This is a completed and published project available via package managers.
+
+## Installation Methods
+
+### Homebrew (Recommended for macOS/Linux)
 ```bash
-npm run build         # Compile TypeScript to JavaScript
+brew install ai-s-tools/tap/git-runner
 ```
 
-### Running the Application
+### npm (Global installation)
 ```bash
-npm start             # Run compiled JavaScript
-npm run dev           # Run TypeScript directly with ts-node
+npm install -g @ai-s-tools/git-runner
 ```
 
-### Development Mode
-```bash
-npm run watch         # Watch mode - automatically recompile on changes
-```
+### Direct Binary Download
+Download platform-specific binaries from GitHub releases:
+- Linux: `git_runner-linux`
+- macOS: `git_runner-macos`
+- Windows: `git_runner.exe`
 
-### Dependency Management
-```bash
-npm install           # Install dependencies
-npm update            # Update dependencies
-```
+## Key Features
 
-## Architecture Overview
+### AI Integration
+- **Local CLI Integration**: Uses locally installed AI tools instead of API tokens
+- **Priority Order**: Gemini → Qwen → Claude (automatic fallback)
+- **No API Keys Required**: All AI models run via local CLI tools
+- **Fallback**: Timestamp-based messages if no AI available
 
-### Core Components
+### Repository Discovery
+- **Project Root Detection**: Automatically finds `.git` directories
+- **Workspace Integration**: Parses VS Code `.code-workspace` files
+- **Submodule Support**: Processes Git submodules from `.gitmodules`
+- **Processing Order**: Submodules first, then main repositories
 
-**Main Entry Point**: `src/git-runner.ts` - Single file containing all functionality
-- **Process Management**: Uses Node.js `child_process` for Git command execution
-- **Repository Discovery**: Multi-layered scanning approach
-- **Timer System**: Periodic execution every 5 minutes with manual controls
-- **AI Integration**: OpenRouter agent integration for intelligent commit messages
+### Automation
+- **Periodic Commits**: Every 5 minutes automatically
+- **Intelligent Push**: Only pushes when remote repositories exist
+- **Interactive Control**: Real-time keyboard commands (`r`, `R`, `q`)
 
-### Repository Discovery Logic
+## Architecture
 
-The tool uses a sophisticated repository discovery system:
+### Core Files (Published Project)
+- `src/git-runner.ts`: Main application logic
+- `ai-agent/bin/ai-commit-agent.ts`: AI integration handler
+- `package.json`: Node.js configuration and scripts
+- `Formula/git-runner.rb`: Homebrew formula
 
-1. **Project Root Detection**: Scans upward from script directory to find `.git`
-2. **Workspace Integration**: Parses `.code-workspace` files for additional repositories
-3. **Submodule Processing**: Reads `.gitmodules` for submodule repositories
-4. **Processing Order**: Submodules first, then main repositories (prevents conflicts)
+### Cross-Platform Binaries
+Built using `pkg` to create standalone executables:
+- **Linux**: ~46MB executable
+- **macOS**: ~51MB executable
+- **Windows**: ~38MB executable
 
-### Key Functions
+## Development Context
 
-- `findProjectRoot()`: Locates project root via `.git` directory traversal
-- `findGitRepositories()`: Discovers all Git repos (main + workspace + submodules)
-- `runGitTasks()`: Orchestrates repository processing with proper ordering
-- `generateCommitMessageWithOpenRouter()`: AI-powered commit message generation
-- `gitCommit()`: Handles staging, sparse-checkout detection, and commits
-- `gitPush()`: Manages upstream branch setup and pushing
+This project was converted from Dart to TypeScript and enhanced with:
+- Local AI CLI integration (replacing token-based OpenRouter)
+- Cross-platform binary distribution
+- Package manager support (Homebrew, npm)
+- Improved error handling and repository discovery
 
-### Interactive Commands
-
-During execution, the tool accepts single-character commands:
-- `r` - Manual re-scan and process all repositories
-- `R` - Reload/restart the entire script
-- `q` - Graceful shutdown with timer cleanup
-
-### Integration Features
-
-**OpenRouter Agent Integration**:
-- Looks for `openrouter/bin/openrouter_agent.dart` in project root
-- Generates intelligent commit messages using AI
-- Falls back to timestamp-based messages if unavailable
-
-**VS Code Task Integration**:
-- Pre-configured tasks in `tasks.json` for background execution
-- Can run as folder-open task for automatic startup
-
-### Error Handling Patterns
-
-- Continues operation if individual repositories fail
-- Graceful fallback when AI commit generation fails
-- Skips push operations when remotes are unavailable
-- Proper cleanup on shutdown or restart
+The project is feature-complete and published. Any development work should focus on maintenance, bug fixes, or feature enhancements to the published codebase.
