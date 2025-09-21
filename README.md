@@ -13,8 +13,7 @@ Automated periodic git commits and push operations across multiple repositories 
 
 ```bash
 # macOS/Linux (Homebrew)
-brew tap ai-s-tools/tap
-brew install git-runner
+brew install ai-s-tools/tap/git-runner
 
 # Windows (Chocolatey) - Coming soon
 choco install git-runner
