@@ -12,11 +12,9 @@ Automated periodic git commits and push operations across multiple repositories 
 ### Package Manager Install (Recommended)
 
 ```bash
-# Ubuntu/Linux (Snap)
-sudo snap install git-runner
-
-# macOS (Homebrew) - Coming soon
-brew install ai-s-tools/tap/git-runner
+# macOS/Linux (Homebrew)
+brew tap ai-s-tools/tap
+brew install git-runner
 
 # Windows (Chocolatey) - Coming soon
 choco install git-runner
