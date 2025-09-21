@@ -298,7 +298,11 @@ async function generateCommitMessageWithAI(repoPath: string): Promise<string | n
 
     try {
       console.log('  - Executing AI agent...');
-      const { stdout: commitMessage } = await execAsync(`npx ts-node ${aiAgentPath} "${stagedFiles.replace(/"/g, '\\"')}" "${diffOutput.replace(/"/g, '\\"')}"`, {
+
+      // Create a simple summary for the AI
+      const changesSummary = `Files changed: ${stagedFiles.split('\n').filter(f => f.trim()).length} files, Diff size: ${diffOutput.length} chars`;
+
+      const { stdout: commitMessage } = await execAsync(`npx ts-node ${aiAgentPath} --man "${changesSummary}"`, {
         cwd: projectRoot,
         timeout: 30000,
         maxBuffer: 1024 * 1024
