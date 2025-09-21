@@ -1,0 +1,31 @@
+{
+  "name": "git-runner",
+  "version": "1.0.0",
+  "description": "Automated Git Operations Tool for Multi-Repository Projects",
+  "main": "dist/git-runner.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/git-runner.js",
+    "dev": "ts-node src/git-runner.ts",
+    "watch": "tsc --watch"
+  },
+  "dependencies": {
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": [
+    "git",
+    "automation",
+    "repository",
+    "continuous-development"
+  ],
+  "author": "",
+  "license": "MIT"
+}
