@@ -215,55 +215,55 @@ async function processRepository(repoPath: string): Promise<void> {
   }
 }
 
-// Checks if OpenRouter agent is available on the system
-async function isOpenRouterAgentAvailable(): Promise<boolean> {
+// Checks if AI agent is available on the system
+async function isAIAgentAvailable(): Promise<boolean> {
   try {
-    console.log('  - Checking if OpenRouter agent is available...');
+    console.log('  - Checking if AI agent is available...');
 
     const scriptDir = path.dirname(process.argv[1]);
     const projectRoot = await findProjectRoot(scriptDir);
 
     if (!projectRoot) {
-      console.log('  - Could not find project root for OpenRouter agent');
+      console.log('  - Could not find project root for AI agent');
       return false;
     }
 
-    const openrouterAgentPath = path.join(projectRoot, 'openrouter', 'bin', 'openrouter_agent.dart');
+    const aiAgentPath = path.join(projectRoot, 'ai-agent', 'bin', 'ai-commit-agent.ts');
 
     try {
-      await fs.access(openrouterAgentPath);
-      console.log(`  - OpenRouter agent found at: ${openrouterAgentPath}`);
+      await fs.access(aiAgentPath);
+      console.log(`  - AI agent found at: ${aiAgentPath}`);
 
-      // Test if we can run it with --help
+      // Test if we can run it with --check-models
       try {
-        await execAsync(`dart ${openrouterAgentPath} --help`);
-        console.log('  - OpenRouter agent is functional');
+        await execAsync(`npx ts-node ${aiAgentPath} --check-models`, { cwd: projectRoot });
+        console.log('  - AI agent is functional');
         return true;
       } catch (error) {
-        console.log(`  - OpenRouter agent found but not functional: ${error}`);
+        console.log(`  - AI agent found but not functional: ${error}`);
         return false;
       }
     } catch {
-      console.log(`  - OpenRouter agent not found at expected path: ${openrouterAgentPath}`);
+      console.log(`  - AI agent not found at expected path: ${aiAgentPath}`);
       return false;
     }
   } catch (e) {
-    console.log(`  - Error checking OpenRouter agent availability: ${e}`);
+    console.log(`  - Error checking AI agent availability: ${e}`);
     return false;
   }
 }
 
-// Generates a commit message using OpenRouter agent based on staged changes
-async function generateCommitMessageWithOpenRouter(repoPath: string): Promise<string | null> {
+// Generates a commit message using AI agent based on staged changes
+async function generateCommitMessageWithAI(repoPath: string): Promise<string | null> {
   try {
-    console.log('  - Starting OpenRouter agent commit message generation...');
+    console.log('  - Starting AI agent commit message generation...');
 
     // Check if there are staged changes
     console.log('  - Checking for staged changes...');
     const { stdout: stagedFiles } = await execAsync('git status --porcelain', { cwd: repoPath });
 
     if (!stagedFiles.trim()) {
-      console.log('  - No staged changes found for OpenRouter analysis');
+      console.log('  - No staged changes found for AI analysis');
       return null;
     }
 
@@ -275,74 +275,49 @@ async function generateCommitMessageWithOpenRouter(repoPath: string): Promise<st
     });
 
     // Get diff for more context
-    console.log('  - Getting git diff for OpenRouter analysis...');
+    console.log('  - Getting git diff for AI analysis...');
     const { stdout: diffOutput } = await execAsync('git diff --cached', { cwd: repoPath });
 
     if (!diffOutput) {
-      console.log('  - No diff output available for OpenRouter');
+      console.log('  - No diff output available for AI');
       return null;
     }
 
     console.log(`  - Diff size: ${diffOutput.length} characters`);
 
-    // Find the OpenRouter agent path
+    // Find the AI agent path
     const scriptDir = path.dirname(process.argv[1]);
     const projectRoot = await findProjectRoot(scriptDir);
 
     if (!projectRoot) {
-      console.log('  - Could not find project root for OpenRouter agent');
+      console.log('  - Could not find project root for AI agent');
       return null;
     }
 
-    const openrouterAgentPath = path.join(projectRoot, 'openrouter', 'bin', 'openrouter_agent.dart');
-
-    // Create the query for OpenRouter
-    const query = `Analyze the following git diff and generate a conventional commit message.
-
-Git Status:
-${stagedFiles}
-
-Git Diff:
-${diffOutput.length > 2000 ? diffOutput.substring(0, 2000) + '\n... (truncated)' : diffOutput}
-
-Please generate a conventional commit message using the format: type(scope): description
-Be concise and descriptive. Focus on what changed and why.
-Return only the commit message, nothing else.`;
+    const aiAgentPath = path.join(projectRoot, 'ai-agent', 'bin', 'ai-commit-agent.ts');
 
     try {
-      console.log('  - Executing OpenRouter agent...');
-      const { stdout: commitMessage } = await execAsync(`dart ${openrouterAgentPath} --man "${query}"`, { cwd: repoPath });
+      console.log('  - Executing AI agent...');
+      const { stdout: commitMessage } = await execAsync(`npx ts-node ${aiAgentPath} "${stagedFiles.replace(/"/g, '\\"')}" "${diffOutput.replace(/"/g, '\\"')}"`, {
+        cwd: projectRoot,
+        timeout: 30000,
+        maxBuffer: 1024 * 1024
+      });
 
-      console.log('  - OpenRouter agent execution completed');
+      console.log('  - AI agent execution completed');
 
       if (commitMessage.trim()) {
-        // Extract just the commit message if OpenRouter returns extra text
-        const lines = commitMessage.trim().split('\n');
-        let finalMessage = commitMessage.trim();
-
-        // Look for a line that looks like a conventional commit
-        for (const line of lines) {
-          if (/^(feat|fix|docs|style|refactor|test|chore|perf|ci|build)(\(.+\))?: .+/.test(line.trim())) {
-            finalMessage = line.trim();
-            break;
-          }
-        }
-
-        // If no conventional commit found, use the first non-empty line
-        if (finalMessage === commitMessage.trim() && lines.length > 0) {
-          finalMessage = lines[0].trim();
-        }
-
+        const finalMessage = commitMessage.trim();
         console.log(`  - ✅ Generated commit message: "${finalMessage}"`);
         return finalMessage;
       } else {
-        console.log('  - ❌ OpenRouter agent returned empty output');
+        console.log('  - ❌ AI agent returned empty output');
       }
     } catch (e) {
-      console.log(`  - ❌ Error executing OpenRouter agent: ${e}`);
+      console.log(`  - ❌ Error executing AI agent: ${e}`);
     }
   } catch (e) {
-    console.log(`  - ❌ Error generating commit message with OpenRouter agent: ${e}`);
+    console.log(`  - ❌ Error generating commit message with AI agent: ${e}`);
   }
 
   console.log('  - Falling back to default commit message');
@@ -414,11 +389,11 @@ async function gitCommit(repoPath: string): Promise<void> {
     // Generate commit message
     let commitMessage = `Auto-commit by git_runner at ${new Date().toISOString()}`;
 
-    // Try to use OpenRouter agent if available
+    // Try to use AI agent if available
     console.log('  - Attempting to generate intelligent commit message...');
-    if (await isOpenRouterAgentAvailable()) {
-      console.log('  - ✅ OpenRouter agent is available, generating AI commit message...');
-      const aiCommitMessage = await generateCommitMessageWithOpenRouter(repoPath);
+    if (await isAIAgentAvailable()) {
+      console.log('  - ✅ AI agent is available, generating intelligent commit message...');
+      const aiCommitMessage = await generateCommitMessageWithAI(repoPath);
       if (aiCommitMessage && aiCommitMessage.trim()) {
         commitMessage = aiCommitMessage;
         console.log('  - ✅ Using AI-generated commit message');
@@ -426,7 +401,7 @@ async function gitCommit(repoPath: string): Promise<void> {
         console.log('  - ❌ AI commit generation failed, using fallback message');
       }
     } else {
-      console.log('  - ❌ OpenRouter agent not available, using default commit message');
+      console.log('  - ❌ AI agent not available, using default commit message');
     }
 
     // Commit with the generated message
